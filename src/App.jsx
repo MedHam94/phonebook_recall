@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from 'axios'
-import personServices from './services/persons'
+import personServices from "./services/persons";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
@@ -10,45 +9,81 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  
 
-  useEffect(()=>{
-    console.log('effect');
-    personServices.getAll()
-      .then(result=>{
-        console.log('Promise fulfilled');
-        setPersons(result.data)
-      })
-  },[])
 
+
+  const generateID = (arr)=>{
+    return arr.length + 1
+  }
   const submitForm = (event) => {
     event.preventDefault();
     console.log("button clicked", event.target);
 
     const person = {
       name: newName,
-      number: newNumber
-    }
+      number: newNumber,
+      id:`${generateID(persons)}`
+    };
+
+
 
     if (checkDuplicate(persons)) {
       alert(`${newName} is already existed`);
+      if(window.confirm(`${newName} is already added to the phonebook, replace the old number?`)){
+
+        const existingNum = persons.find(el =>el.name=== newName)
+        const updateNum = {...existingNum, number:newNumber}
+
+        // console.log('existing',existingNum);
+
+        personServices
+          .update(existingNum.id, updateNum)
+          .then(res =>{
+            personServices.getAll().then((result) => {
+              console.log("Promise fulfilled");
+              setPersons(result.data);
+              
+            });
+          })
+          setNewName("");
+          setNewNumber("");
+      }
     } else {
-        personServices.createPerson(person)
-            .then(result =>{
-                console.log(result)
-                setPersons((result) => {
-                    return [...result, { name: newName, number: newNumber }];
-
-                });
-                setNewName("");
-                setNewNumber("");
-            })
-
+      personServices.createPerson(person).then((result) => {
+        console.log(result);
+        setPersons((result) => {
+          return [...result, person];
+        });
+        setNewName("");
+        setNewNumber("");
+      });
     }
   };
 
-  const handleDelete=()=>{
+  const handleDelete = (id) => {
+    const personToDelete = persons.find(el => el.id === id)
+    console.log(personToDelete,persons);
+    if(window.confirm(`Delete ${personToDelete.name}`)){
+      personServices
+        .deletePerson(id)
+        .then((res) =>{
+          console.log(persons);  
+          setPersons((result)=>{
+            return result.filter(el => el.id !== id)
+          })        
+        })
+    }
+  };
 
-  }
+  useEffect(() => {
+    console.log("effect");
+    personServices.getAll().then((result) => {
+      console.log("Promise fulfilled");
+      setPersons(result.data);
+      
+    });
+  }, []);
 
   const handleNameChange = (event) => {
     console.log(event.target.value);
@@ -92,8 +127,7 @@ const App = () => {
 
       <h2>Numbers</h2>
 
-      <Persons persons={filteredList} handleDelete={handleDelete}/>
-
+      <Persons persons={filteredList} handleDelete={handleDelete} />
     </div>
   );
 };
