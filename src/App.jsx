@@ -13,9 +13,9 @@ const App = () => {
   const [errorMessage, setMessage] = useState(null);
   const [style, setStyle] = useState("");
 
-  // const generateID = (arr) => {
-  //   return arr.length + 1;
-  // };
+  const generateID = (arr) => {
+    return arr.length + 1;
+  };
 
   const cleanForm = () => {
     setNewName("");
@@ -28,7 +28,7 @@ const App = () => {
     const person = {
       name: newName,
       number: newNumber,
-      // id: `${generateID(persons)}`,
+      id: `${generateID(persons)}`,
     };
 
     if (checkDuplicate(persons)) {
