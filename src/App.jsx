@@ -11,7 +11,6 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
   const [errorMessage, setMessage] = useState(null);
-  const [style, setStyle] = useState("");
 
   const generateID = (arr) => {
     return arr.length + 1;
