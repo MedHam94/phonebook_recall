@@ -12,8 +12,8 @@ const App = () => {
   const [search, setSearch] = useState("");
   const [errorMessage, setMessage] = useState(null);
 
-  const generateID = (arr) => {
-    return arr.length + 1;
+  const generateID = () => {
+    return Math.floor(Math.random() * 1000000); 
   };
 
   const cleanForm = () => {
@@ -27,7 +27,7 @@ const App = () => {
     const person = {
       name: newName,
       number: newNumber,
-      id: `${generateID(persons)}`,
+      id: `${generateID()}`,
     };
 
     if (checkDuplicate(persons)) {
