@@ -40,13 +40,13 @@ const App = () => {
         const existingNum = persons.find((el) => el.name === newName);
         const updateNum = { ...existingNum, number: newNumber };
 
-        // console.log('existing',existingNum);
+        console.log('existing',existingNum);
 
         personServices.update(existingNum.id, updateNum).then((res) => {
           personServices.getAll().then((result) => {
             console.log("Promise fulfilled");
             setPersons(result.data);
-          });
+          }).catch(err=>console.error(err));
         });
         cleanForm();
       }
