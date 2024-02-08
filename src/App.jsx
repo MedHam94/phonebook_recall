@@ -13,7 +13,7 @@ const App = () => {
   const [errorMessage, setMessage] = useState(null);
 
   const generateID = () => {
-    return Math.floor(Math.random() * 1000000); 
+    return Math.floor(Math.random() * 1000000);
   };
 
   const cleanForm = () => {
@@ -29,6 +29,23 @@ const App = () => {
       number: newNumber,
       id: `${generateID()}`,
     };
+    const regex = /^\d{2,3}-\d{7,8}$/
+
+    if (newName.length < 3) {
+      setMessage("Name must be at least three characters long.");
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+      return;
+    }
+
+    if(!regex.test(newNumber)){
+      setMessage('eg. 09-1234556 and 040-22334455 are valid phone numbers')
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+      return
+    }
 
     if (checkDuplicate(persons)) {
       alert(`${newName} is already existed`);
@@ -40,29 +57,37 @@ const App = () => {
         const existingNum = persons.find((el) => el.name === newName);
         const updateNum = { ...existingNum, number: newNumber };
 
-        console.log('existing',existingNum);
+        console.log("existing", existingNum);
 
         personServices.update(existingNum.id, updateNum).then((res) => {
-          personServices.getAll().then((result) => {
-            console.log("Promise fulfilled");
-            setPersons(result.data);
-          }).catch(err=>console.error(err));
+          personServices
+            .getAll()
+            .then((result) => {
+              console.log("Promise fulfilled");
+              setPersons(result.data);
+            })
+            .catch((err) => console.error(err));
         });
         cleanForm();
       }
     } else {
-      personServices.createPerson(person).then((result) => {
-        console.log(result);
-        setPersons((result) => {
-          return [...result, person];
-        });
-        cleanForm();
+      personServices
+        .createPerson(person)
+        .then((result) => {
+          console.log(result);
+          setPersons((result) => {
+            return [...result, person];
+          });
+          cleanForm();
 
-        setMessage(`Added ${newName}`);
-        setTimeout(() => {
-          setMessage(null);
-        }, 1500);
-      });
+          setMessage(`Added ${newName}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 1500);
+        })
+        .catch((error) => {
+          setMessage(error.response.data.error);
+        });
     }
   };
 
